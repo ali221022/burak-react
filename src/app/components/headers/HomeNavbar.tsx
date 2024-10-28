@@ -20,7 +20,7 @@ export default function HomeNavbar() {
     /*HANDLERS*/
 
     const buttonHandler = () => {
-        setCount(count + 1);
+        setCount((prevCount) => (prevCount < 24 ? prevCount + 1 : 1));
     };
 
     return (
