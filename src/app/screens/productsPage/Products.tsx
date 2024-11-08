@@ -2,23 +2,20 @@ import React, { ChangeEvent, useEffect, useState } from "react"
 import { Container, Button, Box, Stack, colors, Input } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import MonetizationOnIcon from "@mui/icons-material/MonetizationOn";
-import { Collections, RemoveRedEye } from "@mui/icons-material";
 import RemoveRedEyeIcon from "@mui/icons-material/RemoveRedEye";
 import Badge from "@mui/material/Badge";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import Pagination from '@mui/material/Pagination';
 import { createSelector, Dispatch } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import { setProducts } from "./slice";
 import { Product, ProductInquiry } from "../../lib/types/product";
-import { create } from "domain";
 import { retrieveProducts } from "./selector";
 import "../../../css/products.css";
 import ProductService from "../../services/ProductService";
 import { ProductCollection } from "../../lib/enums/product.enum";
 import { serverApi } from "../../lib/config";
 import { useHistory } from "react-router-dom";
+import { CartItem } from "../../lib/types/search";
 
 /** REDUX SLICE & SELECTOR */
 
@@ -31,9 +28,13 @@ const productsRetriever = createSelector(
     products
   }));
 
+  interface ProductsProps {
+    onAdd: (item: CartItem) => void;
+ };
 
 
-export default function Products() {
+export default function Products(props: ProductsProps) {
+   const { onAdd } = props;
    const { setProducts } = actionDispatch(useDispatch());
    const { products } = useSelector(productsRetriever); 
    const [productSearch, setProductSearch] = useState<ProductInquiry>({
@@ -85,7 +86,7 @@ export default function Products() {
        setProductSearch({ ...productSearch });     
     };
 
-    const chooseDishHandler = (id: string) => {
+    const choosenDishHandler = (id: string) => {
       history.push(`products/${id}`)
     };
 
@@ -207,19 +208,33 @@ export default function Products() {
                         <Stack 
                           key={product._id} 
                           className={"product-card"}
-                          onClick={() => chooseDishHandler(product._id)}
+                          onClick={() => choosenDishHandler(product._id)}
                           >
                           <Stack
                             className={"product-img"}
                             sx={{ backgroundImage: `url(${imagePath})` }}
                           >
                             <div className={"product-sale"}>{sizeVolume}</div>
-                            <Button className={"shop-btn"}>
+                            <Button 
+                                className={"shop-btn"} 
+                                onClick={(e) => {
+                                  onAdd({
+                                    _id: product._id,
+                                    quantity: 1,
+                                    name: product.productName,
+                                    price: product.productPrice,
+                                    image: product.productImages[0],
+                                  });
+                                  e.stopPropagation();
+                                 }}
+                            >
                                 <img src="/icons/shopping-cart.svg"
                                 style={{display:"flex"}}/>
                             </Button>
-                            <Button className={"view-btn"} sx={{ right: "36px" }}>
-                              <Badge 
+                            <Button
+                               className={"view-btn"} 
+                               sx={{ right: "36px" }}>
+                               <Badge 
                                  badgeContent={product.productViews} 
                                  color="secondary">
                                 <RemoveRedEyeIcon
