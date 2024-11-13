@@ -4,8 +4,8 @@ import { CartItem } from "../lib/types/search";
 
 const useBasket = () => {
     const cartJson: string | null = localStorage.getItem("cartData");
-  const currentCart = cartJson ? JSON.parse(cartJson) : [];
-  const [cartItems, setCartItems] = useState<CartItem[]>(currentCart);
+    const currentCart = cartJson ? JSON.parse(cartJson) : [];
+    const [cartItems, setCartItems] = useState<CartItem[]>(currentCart);
 
   const onAdd = (input: CartItem) => {
     const exist: any = cartItems.find((item: CartItem) => item._id === input._id);
